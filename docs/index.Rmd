@@ -1,0 +1,303 @@
+---
+title: "Kickstarter Data Analysis Project"
+author: "Patrick Tan"
+date: "2025-04-24"
+output: 
+  html_document:
+  self_contained: true
+
+---
+
+*Disclaimer: Some of these codes are taught by my Professor Liu Qi Zhang from NUS during my course (DBA3702) back while I was still in school*
+
+
+
+## 1. Importing Relevant Libraries
+```{r}
+#Importing all relevant libraries
+library("ggplot2")
+library("png")
+library("gifski")
+library("gganimate")
+library("dplyr")
+library("RColorBrewer") #Used in Plot 2
+library("ggcorrplot") #Used in Plot 7
+library("lubridate") #Used in Plot 8
+
+```
+
+## 2. Reading and Understanding the Dataset
+```{r}
+kickstarter <- read.csv("./Dataset/Lesson 7 Dataset/kickstarter.csv")
+head(kickstarter,1)
+
+# Noted Problem 1: created_at & deadline & launched_at are in character but they are dates
+
+kickstarter_col <- colnames(kickstarter) #To decide which variables to analyze
+# kickstarter_col 
+```
+### Question 1: Which project categories are the most and least popular among Kickstarter Creators? (Plot 1)
+```{r}
+# Which project categories are the most and least popular among Kickstarter Creators?
+
+#Setup for plot (D)
+ksplot1 <- kickstarter %>% group_by(maincategory) %>% summarise(Count=n()) %>% mutate(fill_color= case_when(
+                                                                                            Count == max(Count) ~ "green",
+                                                                                            Count == min(Count) ~ "red",
+                                                                                            TRUE ~ "beige"
+                                                                                            ))
+#Establishing Plot 1 with adjustments
+plot1 <- ksplot1 %>% ggplot(aes(x=maincategory,y=Count,fill=fill_color)) + geom_bar(stat='identity') + coord_polar(clip= "off") +scale_fill_identity() +labs(title="Kickstarter Projects by Main Category", x="Main Category",y = "Number of Projects") +geom_text(aes(label = Count), color = "black", size = 3, nudge_y=300) +
+  theme(
+    axis.text.y = element_blank(),      # Hide radial axis
+    axis.ticks.y = element_blank(),
+    axis.title.y = element_blank(),
+    axis.title.x = element_blank()
+  ) 
+
+```
+### Question 2: Among all the projects in Kickstarter, what proportion does each states take up? (Plot 2)
+### Question 3: What is the rate of success for each maincategory? (Plot 3)
+### Question 4: Top 5 Countries that are highly participative in Kickstarter (Plot 4)
+```{r}
+# Checking what are the states in Kickstarters
+# unique(kickstarter$state)
+
+
+# There are 4 possible outcomes in every kickstarter project
+# kickstarter %>% group_by(maincategory) %>% summarise(success.rate = mean(state=="successful"))
+
+
+
+# Among all the projects in Kickstarter, what proportion does each states take up?
+plot2 <- kickstarter %>% group_by(state) %>% summarise(Count = n()) %>% mutate(Rate = round((Count / sum(Count))*100,3)) %>% ggplot(aes(x=state,y=Rate)) + geom_bar(stat='identity',fill="lightblue") +ylab("Rate (%)") + theme_minimal()
+
+
+# What is the rate of success for each maincategory? 
+ksplot3 <- kickstarter%>% group_by(maincategory) %>% summarise(success.rate=mean(state=="successful"))
+plot3 <-  ksplot3 %>% ggplot(aes(x=success.rate,y=maincategory)) +geom_bar(stat='identity')
+
+
+
+# Top 5 Countries that are highly participative in Kickstarter
+
+countryshare <- kickstarter %>% group_by(country) %>% summarise(Count = n()) %>% arrange(desc(Count)) %>% slice_head(n=5)
+
+
+restoftheshare <- data.frame(country="Rest", Count = nrow(kickstarter)- sum(countryshare$Count))
+
+
+countryshare <- rbind(countryshare,restoftheshare)
+
+
+plot4 <- ggplot(countryshare, aes(x = "", y = Count, fill = country)) +
+  geom_bar(stat = "identity", width = 1, color = "white") + 
+  coord_polar("y", start = 0) +
+  scale_fill_brewer(palette = "Pastel1") +  # Matching your color style
+  theme_void() +                           # Clean, removes axes and gridlines
+  labs(title = "Kickstarter Projects by Country") +
+  theme(legend.title = element_blank())
+
+
+```
+### Question 5: Which 5 countries are participating actively in Kickstarter and what categories are successful for them? (Plot 5)
+
+```{r}
+# Which 5 countries are participating actively in Kickstarter and what categories are successful for them?
+
+top5<- countryshare$country[1:5]
+
+kickstarter$countrycopy <- ifelse(kickstarter$country %in% top5, kickstarter$country, "Rest")
+
+ksplot5 <- kickstarter %>% filter(state!='live') %>% group_by(maincategory,countrycopy) %>%summarise(success_rate =mean(state=="successful"))
+
+
+plot5 <- ggplot(ksplot5, aes(x=reorder(maincategory,success_rate),y=success_rate)) +geom_bar(stat='identity') +coord_flip() +facet_wrap(~countrycopy)
+
+
+# Make plot5 stand out more and easier to distinguish
+
+num.categories <- length(unique(ksplot5$maincategory))
+
+ksplot5 <- ksplot5[order(ksplot5$countrycopy,-ksplot5$success_rate),]
+
+top_record <- ksplot5 %>% group_by(countrycopy) %>% slice_head(n=3) %>% mutate(rank="Top")
+bottom_record <- ksplot5 %>% group_by(countrycopy) %>% slice_tail(n=3) %>% mutate(rank="Bottom")
+middle_record <- ksplot5 %>% group_by(countrycopy) %>% slice(4:(num.categories-3)) %>% mutate(rank = "Middle")
+
+ksplot5 <- rbind(top_record,bottom_record,middle_record)
+ksplot5$rank <- as.factor(ksplot5$rank)
+
+plot5 <- ggplot(ksplot5, aes(x=reorder(maincategory,success_rate),y=success_rate,fill=rank)) +geom_bar(stat='identity') +facet_wrap(~countrycopy) +coord_flip() +scale_fill_manual(values=c("thistle","lightblue","lemonchiffon"))+ xlab("Main Category") + ylab("Success Rate")
+
+```
+### Question 6: Does higher backer count lead to higher success rate? (Plot 6)
+### Question 5.2: Top 3 Sub Categories that are successful among each maincategory (Plot 5_alt)
+```{r}
+# Does higher backer count lead to higher success rate?
+
+plot6 <- kickstarter %>%
+  filter(state != "live") %>%
+  group_by(maincategory) %>%
+  summarise(avg_backers = mean(backers_count),
+            success_rate = mean(state == "successful")) %>%
+  ggplot(aes(x = avg_backers, y = success_rate)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "Does Higher Backer Count Lead to Higher Success Rate?",
+       x = "Average Number of Backers", y = "Success Rate")
+
+
+# Top 3 Sub Categories that are successful among each maincategory
+plot5_alt <- kickstarter %>%
+  filter(state != "live") %>%
+  group_by(maincategory,subcategory) %>%
+  summarise(success_rate = mean(state == "successful"),subcategorycount=n(), .groups="drop")
+
+#Only accepts projects that are more than 30
+plot5_alt <- plot5_alt %>% filter(subcategorycount>50) %>%group_by(maincategory) %>% slice_max(success_rate, n=3) %>% ungroup()
+
+plot5_alt <- ggplot(plot5_alt) +geom_bar(aes(x=maincategory,y=success_rate,fill=subcategory),position='dodge',stat='identity') +theme(plot.margin=margin(1,0,0,1,"cm")) +theme(axis.text.x = element_text(size=10)) +labs(title="Top 3 Sub Categories that are successful among each maincategory") +xlab("Main Category") +ylab("Success Rate") +theme(plot.title=element_text(size=20))
+
+
+ggsave("kickstarter_success_plot.png", plot = plot5_alt, width = 16, height = 9, dpi = 300)
+# For viewing purposes, not included in HTML
+
+```
+
+### Question 7: How does each factors correlate to each other by its success rate? (Plot 7)
+```{r}
+# Correlation Matrix to show which factors affect success rate
+
+
+
+####### SORTING OUT DATA TYPES #########
+
+
+# state
+plot7 <- kickstarter %>% filter(state != "live")
+plot7$state_numeric <- ifelse(plot7$state == "successful",1,0)
+
+# percentage funded column = converted pledge amount / goal
+plot7 <- plot7 %>% mutate(percentage_funded = round(converted_pledged_amount/goal,2))
+
+# Dates (launched_at & deadline)
+plot7 <- plot7 %>% mutate(launched_at= as.Date(launched_at,format = "%d/%m/%Y"),deadline=as.Date(deadline,format = "%d/%m/%Y"),created_at=as.Date(created_at,format = "%d/%m/%Y"))
+plot7 <- plot7 %>% mutate(duration_days = as.numeric(deadline - launched_at))
+
+#Country 
+country_success <- plot7 %>% group_by(country) %>% summarise(country_success_rate = mean(state_numeric))
+
+#maincategory
+category_success <- plot7 %>% group_by(maincategory) %>% summarise(category_success_rate = mean(state_numeric))
+
+plot7 <- plot7 %>% left_join(country_success,by="country") %>% left_join(category_success, by = "maincategory")
+
+
+## Backer_count check for skewness ##
+
+# ggplot(plot7, aes(x = log(backers_count+1))) +geom_histogram(bins = 50) +labs(title = "Distribution of Backers Count") #skewed; log needed
+# 
+# ggplot(plot7, aes(x = log(goal+1))) +geom_histogram(bins = 50) +labs(title = "Distribution of goal") # skewed ; log needed
+# ggplot(plot7, aes(x = log(percentage_funded+1))) +geom_histogram(bins = 50) +labs(title = "Distribution of percentage_funded") #skewed; log needed
+
+plot7 <- plot7 %>% mutate(backers_count_log= log(backers_count+1),goal_log=log(goal+1),percentage_funded_log=log(percentage_funded+1))
+ksplot7 <- plot7
+
+
+########### Correlation Heatmap #############
+
+plot7 <- plot7 %>% select(backers_count_log,goal_log,percentage_funded_log,duration_days,country_success_rate,category_success_rate,state_numeric)
+
+### SPEARMAN METHOD ###
+
+correlation.plot7 <- cor(plot7,method="spearman")
+
+
+corr_reversed <- correlation.plot7[rev(rownames(correlation.plot7)), ] #Reversing to make corr matrix flow top left to bottom right
+
+plot7_spearman <- ggcorrplot(corr_reversed,
+           method = "square", 
+           type = "full",
+           lab = TRUE,
+           colors = c("#B2DFDB", "white", "#F8BBD0"),
+           title = "Correlation Heatmap of Kickstarter Success Factors",
+           tl.cex = 8,   # text label size (adjust as needed)
+           lab_size = 2.5, # correlation number size (adjust as needed),
+           legend.title="Spearman Correlation",
+           outline.color="gray",
+           hc.order = FALSE
+)
+
+### PEARSON METHOD ###
+correlation.plot7.pearson <- cor(plot7, method = "pearson")
+corr_reversed_pearson <- correlation.plot7.pearson[rev(rownames(correlation.plot7.pearson)), ] #Reversing to make corr matrix flow top left to bottom right
+
+plot7_pearson <- ggcorrplot(corr_reversed_pearson,
+           method = "square", 
+           type = "full",
+           lab = TRUE,
+           colors = c("#8E9AAF", "white", "#CCE5C3"),
+           title = "Correlation Heatmap of Kickstarter Success Factors",
+           tl.cex = 8,   # text label size (adjust as needed)
+           lab_size = 2.5, # correlation number size (adjust as needed),
+           legend.title="Pearson Correlation",
+           outline.color="gray",
+           hc.order = FALSE
+)
+```
+
+### Question 8: Changes in success rates over the years (Plot 8)
+```{r}
+# Changes in success rates over the years
+
+
+plot8 <- kickstarter %>%
+  mutate(year = year(launched_at)) %>%
+  group_by(year) %>%
+  summarise(success_rate = mean(state == "successful")) %>% ggplot(aes(x = year, y = success_rate)) +
+  geom_line() +
+  geom_point()
+
+
+```
+
+## 3. Summary of all plots
+```{r}
+### SUMMARY OF ALL PLOTS + PLOT ADJUSTMENTS ###
+
+# Which project categories are the most and least popular among Kickstarter Creators?
+plot1 +labs(title="Which project categories are the most and least popular among Kickstarter Creators?") +theme(plot.title= element_text(size=10))
+
+# Among all the projects in Kickstarter, what proportion does each states take up?
+plot2 + xlab("State") +labs(title="Among all the projects in Kickstarter, what proportion does each states take up?")
+
+# What is the rate of success for each maincategory? 
+plot3 + labs(title="What is the rate of success for each maincategory?") + xlab("Success Rate") +ylab("Main Categories")
+
+# Top 5 Countries that are highly participative in Kickstarter
+plot4 +labs(title="Top 5 Countries that are highly participative in Kickstarter")
+
+# Which 5 countries are participating actively in Kickstarter and what categories are successful for them?
+plot5 +labs(title="Which 5 countries are participating actively in Kickstarter and what categories are successful for them?")+theme(plot.title= element_text(size=8))
+
+```
+
+*Note: Plot5_alt is not readable if I were to embed it into my HTML using RMarkdown, hence I am using a different method to ensure readability*
+
+<img src="kickstarter_success_plot.png" width="1000">
+
+```{r}
+# Does higher backer count lead to higher success rate?
+plot6
+
+# Correlation Matrix to show which factors affect success rate (Spearman & Pearson Method)
+plot7_spearman
+plot7_pearson
+
+# Changes in success rates over the years
+plot8 +labs(title="Changes in success rates over the years") +xlab("Year") +ylab("Success Rate")
+```
+
+
+*Analysis done by Patrick Tan (NUS Business School)*
