@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Data Analysis Projects</title>
+  <title>Personal Data Analysis Projects</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
 
@@ -25,6 +25,12 @@
       padding: 40px 20px;
       text-align: center;
       box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .dark-mode header {
+      background-color: #2a2a2a;
+      color: #eee;
     }
 
     header h1 {
@@ -36,6 +42,10 @@
       font-size: 16px;
       margin: 0;
       color: #6e6e6e;
+    }
+
+    .dark-mode header p {
+      color: #bbb;
     }
 
     .toolbar {
@@ -131,12 +141,17 @@
       color: #aaa;
       background-color: #f9f9f9;
     }
+
+    .dark-mode footer {
+      background-color: #2a2a2a;
+      color: #888;
+    }
   </style>
 </head>
 <body>
   <header>
-    <h1>Data Analysis Project Portfolio</h1>
-    <p>Interactive R Markdown reports hosted with GitHub Pages</p>
+    <h1>Personal Data Analysis Projects</h1>
+    <p>Data Analysis Portfolio done with R Studio</p>
     <div class="toolbar">
       <div class="search-bar">
         <input type="text" id="searchInput" placeholder="Search project...">
@@ -162,7 +177,7 @@
   </div>
 
   <footer>
-    &copy; 2025 Lee Haeeun. All rights reserved.
+    &copy; 2025 Patrick Tan. All rights reserved.
   </footer>
 
   <script>
