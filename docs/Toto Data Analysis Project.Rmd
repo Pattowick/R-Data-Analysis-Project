@@ -402,6 +402,7 @@ plot6_3 <-snowball_df %>%
   theme_minimal()
 plot6_3
 ```
+
 #### <i> Results suggest punters feel disappointed after 1st Snowball & No Winner by the drastic significant drop in bets, however bets marginally increased when it rolled to 3rd Snowball </i>
 
 
