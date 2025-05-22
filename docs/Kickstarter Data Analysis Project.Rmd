@@ -202,7 +202,7 @@ plot7 <- plot7 %>% left_join(country_success,by="country") %>% left_join(categor
 # ggplot(plot7, aes(x = log(percentage_funded+1))) +geom_histogram(bins = 50) +labs(title = "Distribution of percentage_funded") #skewed; log needed
 
 plot7 <- plot7 %>% mutate(backers_count_log= log(backers_count+1),goal_log=log(goal+1),percentage_funded_log=log(percentage_funded+1))
-ksplot7 <- plot7
+
 
 
 ########### Correlation Heatmap #############
@@ -250,9 +250,10 @@ plot7_pearson <- ggcorrplot(corr_reversed_pearson,
 ### Question 8: Changes in success rates over the years (Plot 8)
 ```{r}
 # Changes in success rates over the years
+ksplot8 <- kickstarter
+ksplot8$launched_at <- as.Date(ksplot8$launched_at,format="%d/%m/%Y")
 
-
-plot8 <- kickstarter %>%
+plot8 <- ksplot8 %>%
   mutate(year = year(launched_at)) %>%
   group_by(year) %>%
   summarise(success_rate = mean(state == "successful")) %>% ggplot(aes(x = year, y = success_rate)) +
