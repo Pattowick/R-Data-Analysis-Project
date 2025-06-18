@@ -1,0 +1,727 @@
+---
+title: "Bike Sharing Business Project"
+author: "Analyzed by: Patrick Tan"
+date: "2025-06-18"
+output:
+  html_document:
+    css: style2.css
+    includes:
+      in_header: header.html
+
+---
+
+## <span style="color:#4A4A4A; font-weight:600; letter-spacing:0.5px;">Bike Sharing Operator</span>
+
+This project presents an in-depth analysis of a bike sharing operator based in London, UK. The primary goal of any bike sharing business is to ensure convenience, accessibility, and a seamless user experience — from the start of a trip to its finish — while maintaining profitability in response to increasing demand for sustainable urban mobility. Whether for commuting or leisure, users expect well-maintained, affordable bikes that support a reliable alternative to traditional transport.
+
+
+To explore how the bike sharing business can optimize its resources and refine its strategic direction, this project first establishes key research questions aimed at supporting the marketing and operations teams in maximizing efficiency and identifying the most effective paths to success. Through extensive data mangling and in-depth analysis, the insights aims to be able to provide valuable recommendations for the bike sharing operator to enhancing profitability, minimizing unnecessary operational costs, and staying aligned with its mission to deliver the best possible experience for its users.
+
+However, given the limitations of the available dataset, several assumptions and disclaimers must be acknowledged.
+  <!-- Spacer -->
+  <div style="height: 40px;"></div>
+
+<!-- Wrapper to center both tables -->
+<div style="text-align: center;">
+
+  <!-- Disclaimer Table -->
+  <table style="margin: 0 auto; border-collapse: collapse; border: 1px solid #ccc; width: 80%;">
+    <tr>
+      <th style="padding: 12px; border: 1px solid #ccc; background-color: #f4f4f4; text-align: center;">
+        Disclaimer
+      </th>
+    </tr>
+    <tr>
+      <td style="padding: 10px; border: 1px solid #ccc;">
+        Dataset only contains data from August to September in 2017.
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 10px; border: 1px solid #ccc;">
+        There are originally 826 stations, but 53 stations are missing from the station dataset. Hence, this analysis will only be conducted on the stations that exist in the <b>station dataset</b>
+      </td>
+    </tr>
+  </table>
+
+  <!-- Spacer -->
+  <div style="height: 30px;"></div>
+  
+<!-- Assumption Table with Collapsible Section -->
+<details style="margin-top: 30px;">
+  <summary style="font-size:18px; font-weight:bold; color:#1C1C1C;">📋 Assumption Table</summary>
+
+  <table style="margin: 20px auto; border-collapse: collapse; width: 80%;">
+    <tr>
+      <th style="text-align: center; padding: 8px; border-bottom: 1px solid #ccc;">Assumptions</th>
+      <th style="text-align: center; padding: 8px; border-bottom: 1px solid #ccc;">Reasoning</th>
+    </tr>
+    <tr>
+      <td style="padding: 8px;">Capacity is assumed to be the number of bikes available at a station at the point of time that this dataset captures</td>
+      <td style="padding: 8px;">Flow dataframe can be used in Research Question 5 to track the inflow and outflows of traffic temporarily</td>
+    </tr>
+    <tr>
+      <td style="padding: 8px;">Duration less than 30 minutes = Commuters, Duration more than 30 minutes = Leisure Riders</td>
+      <td style="padding: 8px;">Commuters tend to use bikes as a last-mile travel hence wouldn't take more than 30 minutes. Of course it is important to note, there are leisure riders that ride lesser than 30 minutes and instances where commuters may ride more than 30 minutes.</td>
+    </tr>
+    <tr>
+      <td style="padding: 8px;">Each journey is assumed to be revenue and duration is 15minutes. Pricing adopted from Lime</td>
+      <td style="padding: 8px;">This is to allow the estimation of disruption cost due to limitations of dataset available</td>
+    </tr>
+  </table>
+
+</details>
+
+
+
+
+
+### <span style="color:#4A4A4A; font-weight: bold; letter-spacing:0.5px;">Dataset used for analysis 💾</span>
+
+While this analysis is based on real historical bike operation data, it is important to note that the dataset should not be considered a representative sample of the broader population. Due to missing and insufficient data, the findings may not accurately reflect the characteristics of the larger system. The following datasets were used in this project:
+
+<table style="width:80%; border-collapse: collapse; margin: 0 auto; border: 1px solid #ccc; text-align: center;">
+  <tr>
+    <th style="padding:10px; border: 1px solid #ccc;">Dataset</th>
+    <th style="padding:10px; border: 1px solid #ccc;">Fields</th>
+  </tr>
+  <tr>
+    <td style="padding:10px; border: 1px solid #ccc;">Stations</td>
+    <td style="padding:10px; border: 1px solid #ccc;">Station.ID, Capacity, Station.Name, Location</td>
+  </tr>
+  <tr>
+    <td style="padding:10px; border: 1px solid #ccc;">Journeys</td>
+    <td style="padding:10px; border: 1px solid #ccc;">Journey.Duration, Journey.ID, End.Date, End.Month, End.Year, End.Hour, End.Minute, End.Station.ID, Start.Date, Start.Month, Start.Year, Start.Hour, Start.Minute, Start.Station.ID</td>
+  </tr>
+</table>
+
+
+## <span style="color:#4A4A4A; font-weight:600; letter-spacing:0.5px;">Research Questions</span>
+The following research questions were designed with the marketing and operations departments in mind. They serve as a framework to uncover key insights into the current business structure, identify operational gaps, and better understand the state of the bike sharing service. These insights will support more informed resource allocation and strategic decision-making within the respective departments.
+
+```{=html}
+<div style="width: 90%; margin: 0 auto;">
+
+  <div style="border: 1px solid #ccc; border-radius: 8px; padding: 16px; margin-bottom: 12px; background-color: #f9f9f9;">
+    <strong>Question 1:</strong> What is the overall distribution of users of the bike sharing service?
+  </div>
+
+  <div style="border: 1px solid #ccc; border-radius: 8px; padding: 16px; margin-bottom: 12px; background-color: #f9f9f9;">
+    <strong>Question 2:</strong> Which stations experience the highest traffic on weekdays compared to weekends?
+  </div>
+
+  <div style="border: 1px solid #ccc; border-radius: 8px; padding: 16px; margin-bottom: 12px; background-color: #f9f9f9;">
+    <strong>Question 3:</strong> Are there observable changes in ridership trends between August and September that may indicate seasonal effects?
+  </div>
+
+  <div style="border: 1px solid #ccc; border-radius: 8px; padding: 16px; margin-bottom: 12px; background-color: #f9f9f9;">
+    <strong>Question 4:</strong> What are the peak usage periods throughout the day?
+  </div>
+
+  <div style="border: 1px solid #ccc; border-radius: 8px; padding: 16px; margin-bottom: 12px; background-color: #f9f9f9;">
+    <strong>Question 5:</strong> Which critical stations require additional resource allocation based on usage intensity?
+  </div>
+
+  <div style="border: 1px solid #ccc; border-radius: 8px; padding: 16px; margin-bottom: 12px; background-color: #f9f9f9;">
+    <strong>Question 6:</strong> How do riding patterns differ between leisure users and commuters across weekdays and weekends?
+  </div>
+
+  <div style="border: 1px solid #ccc; border-radius: 8px; padding: 16px; margin-bottom: 12px; background-color: #f9f9f9;">
+    <strong>Question 7:</strong> When is the optimal time to schedule bike maintenance to minimize service disruption?
+  </div>
+
+  <div style="border: 1px solid #ccc; border-radius: 8px; padding: 16px; margin-bottom: 12px; background-color: #f9f9f9;">
+    <strong>Question 8:</strong> What is the distribution of journey durations among users?
+  </div>
+
+  <div style="border: 1px solid #ccc; border-radius: 8px; padding: 16px; margin-bottom: 12px; background-color: #f9f9f9;">
+    <strong>Question 9:</strong> What are the most common or popular routes taken by users?
+  </div>
+
+  <div style="border: 1px solid #ccc; border-radius: 8px; padding: 16px; margin-bottom: 12px; background-color: #f9f9f9;">
+    <strong>Question 10:</strong> What is the estimated cost of service disruptions based on usage data?
+  </div>
+</div>
+```
+
+
+
+
+
+# 1. Important Relevant Libraries & Dataset
+
+```{r message=FALSE, warning=FALSE}
+library(dplyr)
+library(lubridate)
+library(leaflet)
+library(leaflet.extras)
+library(geodata)
+library(tidyr)
+library(ggplot2)
+library(gganimate)
+library(plotly)
+library(scales)
+
+# Datasets
+station <- read.csv("./Bike Sharing Dataset/stations.csv")
+journey <- read.csv("./Bike Sharing Dataset/journeys.csv")
+
+# To be used with Maps
+UK <- gadm(country='GBR', level=3,path= tempdir())
+
+head(journey,10)
+head(station,10)
+```
+
+## 1.1 Data Manipulation, Cleaning & Sorting
+This step is to prepare the dataset ready for analysis and ensure that all missing values, anomalies are dealt with accordingly. Data type and additional columns are added for efficiency in analysis in the later part.
+
+
+```{r}
+### Dealing with Station Dataset ###
+
+# Locate all the stations ID that are missing from the station dataset
+station <- station %>% arrange(Station.ID) #There are some stations ID missing
+
+# Vector of all possible station IDs
+all_ids <- 1:826
+
+# Convert Station.ID to numeric in case it's not already
+station$Station.ID <- as.numeric(station$Station.ID)
+
+# Find missing IDs
+missing_ids <- setdiff(all_ids, station$Station.ID)
+
+# Split Coordinates into Lon and Lat
+station <- separate(station,Location, into=c("lat","lng"), sep=",")
+station$lat <- as.numeric(gsub("\\(","",station$lat))
+station$lng <- as.numeric(gsub("\\)","",station$lng))
+
+
+#### To ensure Stations in Journey Dataset tallies with Station Dataset ####
+
+# To check if any users start/end station is in the missing_ids (2382 rows)
+journey_w_missingid <- journey[journey$Start.Station.ID %in% missing_ids | journey$End.Station.ID %in% missing_ids,] #Dataset that contain all the rows that have missing station ID
+index <- rownames(journey_w_missingid)
+
+
+# NEW JOURNEY DATASET WITHOUT ROWS THAT INCLUDE MISSING STATION IDS (151414 rows; original 153796 rows) #
+journey_new <- journey[!(rownames(journey)%in% index),]
+
+rownames(journey_new) <- NULL
+journey_new <- journey_new %>% select(Journey.ID,Journey.Duration,Start.Station.ID,Start.Date,Start.Month,Start.Year,Start.Hour,Start.Minute,End.Station.ID,End.Date,End.Month,End.Year,End.Hour,End.Minute)
+
+### Manipulating Journey Dataset ###
+
+# Creating Journey Start Time Column
+journey_new$Start.Time <- paste0(journey_new$Start.Year,"-",journey_new$Start.Month,"-",journey_new$Start.Date," ",journey_new$Start.Hour,":",journey_new$Start.Minute,":0")
+journey_new$Start.Time <- ymd_hms(journey_new$Start.Time)
+
+# Creating Journey End Time Column
+journey_new$End.Time <- paste0(journey_new$End.Year,"-",journey_new$End.Month,"-",journey_new$End.Date," ",journey_new$End.Hour,":",journey_new$End.Minute,":0")
+journey_new$End.Time <- ymd_hms(journey_new$End.Time)
+
+
+# Creating Journey Duration
+journey_new$Duration_s <- as.integer(difftime(journey_new$End.Time, journey_new$Start.Time, units = "secs"))
+journey_new$Duration_m <- as.integer(difftime(journey_new$End.Time, journey_new$Start.Time, units = "mins"))
+```
+
+# 3. Data Analysis Based on Research Questions
+The following section dives into the dataset to unravel meaningful insights to provide more clarity for our research questions.
+
+### 3.1 Research Question 1: What is the overall distribution of users of the bike sharing service?
+```{r}
+# First plot heatmap of a map showing the Start.Station to locate all the stations distributed around London
+
+plot1_df <- journey_new %>% group_by(Start.Station.ID) %>% summarise(Count = n())
+plot1_df <- plot1_df %>% left_join(station, by=c("Start.Station.ID"="Station.ID"))
+
+# Intensity scale gets skewed by a few high-count stations, making lower ones indistinguishable hence this is to make color more sensitive to small differences and avoids domination by outliers.
+plot1_df$logCount <- log1p(plot1_df$Count) 
+
+
+## Plotting the Map
+plot1 <- leaflet(plot1_df) %>% addProviderTiles(providers$CartoDB.DarkMatter) %>% addWebGLHeatmap(lng=~lng,lat=~lat, intensity= ~logCount, size = 30, opacity = 1) %>% setView(lng = mean(plot1_df$lng), lat = mean(plot1_df$lat), zoom = 12)
+plot1
+```
+Based on the map plot above, the bike stations are denoted with red spots which shows the distributions clearly across London, as well as the popularity of each station denoted with the gradient of colors. Observations can be made that <u>most of the stations are concentrated in city area</u> while the <u>outskirts of London has lesser stations available</u> so that the demands can be met for users commuting to work or for leisure purposes. 
+
+### 3.2 Research Question 2: Which stations experience the highest traffic on weekdays compared to weekends?
+```{r message = FALSE, warning = FALSE}
+# Adding a column that provides logical values to determine if the journey was on a weekday or weekend
+journey_new$Is.Weekend <- ifelse(wday(journey_new$Start.Time) %in% c(1, 7), T, F)
+
+# Adding a column to extract the day with its name
+journey_new$dow <- wday(journey_new$Start.Time,week_start=1,label=T,abbr=F)
+
+# Preparing the dataframe for plotting
+plot2_df <- journey_new %>% group_by(Start.Station.ID,dow,Is.Weekend) %>% summarise(Count = n()) %>% arrange(dow,Is.Weekend,Start.Station.ID)
+plot2_df <- plot2_df %>% group_by(Start.Station.ID,Is.Weekend) %>% summarise(Avg.Demand = mean(Count)) %>% arrange(Start.Station.ID)
+plot2_df <- plot2_df %>% left_join(station, by= c("Start.Station.ID" = "Station.ID")) %>% select(Station.Name,Start.Station.ID,Is.Weekend,Avg.Demand)
+
+# Top 10 Stations for Weekdays and Weekends
+plot2_weekday <- plot2_df %>% filter(Is.Weekend== FALSE) %>% arrange(desc(Avg.Demand)) %>% ungroup() %>% slice_head(n=10)
+plot2_weekday <- plot2_weekday %>% ggplot(aes(x=reorder(Station.Name,Avg.Demand),y=Avg.Demand)) + geom_bar(stat='identity',fill="steelblue") +coord_flip() + xlab("Station Names") + ylab("Average Demand") + labs(title="Top 10 Hot Spot during Weekdays") + theme_minimal()
+
+
+plot2_weekend <- plot2_df %>% filter(Is.Weekend==TRUE) %>% arrange(desc(Avg.Demand)) %>% ungroup() %>% slice_head(n=10)
+plot2_weekend <- plot2_weekend %>% ggplot(aes(x=reorder(Station.Name,Avg.Demand),y=Avg.Demand)) + geom_bar(stat='identity',fill="#2E8B57") + coord_flip() + xlab("Station Names") + ylab("Average Demand") + labs(title="Top 10 Hot Spot during Weekends") + theme_minimal()
+
+plot2_weekday
+plot2_weekend
+```
+
+Referencing from the two charts above, visibly they show the top 10 stations that are popular during Weekdays and Weekends. However, diving deeper into the general information of those areas, we are able to find out more valuable insights and hence able to make more sense to the demands respectively. During weekdays, bike demand usually shifts towards <b>commuting and daily travel</b> and users usually use bikes as a <b>last-mile travel</b> from major train stations or bus terminals to their offices. This is evident from King's Cross, Waterloo Stations and Liverpool Street as they are commonly transport hubs where people utilized to get to work. Business districts like Queen Street and The Borough are also found in the chart where people are usually concentrated at during the day, whether commuting to work, running for errands, having a meal or coffee or leaving work, these areas are hotspots for bike sharing services.
+
+As for the Weekends, users are tend to use bikes for <b>leisure and recreational activities</b>. Parks and scenic areas are attractive destinations for relaxing, exercising, or socializing as evident from an increase appearances of park locations: Hyde Park (e.g., Hyde Park Corner, Triangle Car Park, Albert Gate, Park Lane), Kensington Gardens (e.g., Black Lion Gate, Palace Gate), Queen Elizabeth Olympic Park, Shoreditch, Westminster (often popular for casual weekend visits). 
+
+Based on these insights, bike operator services can readjust the resources accordingly to anticipate such demands in those areas to ensure maximum utilization of bikes and minimize idling of bikes which can optimize resource allocation and save costs.
+
+
+### 3.3 Research Question 3: Are there observable changes in ridership trends between August and September that may indicate seasonal effects?
+```{r message = FALSE, warning = FALSE}
+# Extracting out the month from Journey Dataset
+plot3_df <- journey_new %>% mutate(Month = month(Start.Time,label=TRUE))
+
+# Determine the demand daily on the two months
+plot3_df <- plot3_df %>% group_by(Month,dow) %>% summarise(Demand = n()) %>% arrange(Month,dow) 
+
+# Plotting to observe changes in ridership trends between August and September.
+plot3 <- plot3_df %>% ggplot(aes(x=dow,y=Demand,fill=Month)) + geom_bar(stat='identity',position='dodge') + xlab("Day of Week") + labs(title="Ridership Daily Trend Across Aug & Sep 2017") + scale_fill_brewer(palette="Set3") +theme_minimal()
+
+
+## Alternative Plot: Observing riding trend every single day
+
+# Tracking the exact dates
+plot3_altdf <-journey_new %>% mutate(Date = as.Date(Start.Time), Month = month(Start.Time, label = TRUE)) %>% group_by(Month, Date) %>% summarise(Count = n())
+plot3_altlow <- plot3_altdf %>% filter(Count==min(Count)) 
+
+
+# Plotting the line graph
+plot3_alt <- plot3_altdf %>% ggplot(aes(x = Date, y = Count, color = Month)) + geom_line() + labs(title = "Daily Journey Trend: Aug vs Sep 2017") + scale_color_brewer(palette="Set1") + theme_minimal() + scale_x_date(date_breaks = "5 days", date_labels = "%b %d") + geom_point(data=plot3_altlow,aes(x=Date,y=Count),color="red",size=8,shape=21,stroke=0.5)+
+  geom_label(data=plot3_altlow[1,], aes(label=paste("Low:",Count,"|","Date:",Date)), vjust= -2,color="black")+
+  geom_label(data=plot3_altlow[2,], aes(label=paste("Low:",Count,"|","Date:",Date)), vjust= 2,color="black")
+
+
+plot3
+```
+
+Based on the plot, it can be observed that in September 2017, the demands for bike sharing services <b>drop significantly</b> as compared to the month of August. With similar pattern observable, where <b>Tuesdays and Thursdays</b> generally have the highest demand in the week.
+
+According to MetMetters weather report in 2017, September was noted to be marked by windy conditions, precipitation, storm events (e.g., Storm Aileen mid‑September), and recurring cloud & fog patches. An article by The Guardian also reported that, UK summer 2017 saw 32.8% more rain than average (~320mm vs. 241mm), making conditions less favorable for outdoor activities whereas August had warmer and drier days. This could be one of the factor that causes the drastic drop in the demand for bike sharing services across these two months.
+
+Though there are indeed other factors in play that contributed this phenomenon but weather seasonality is one of the biggest contributor to the demand as it disallow commuters or leisure rider from enjoying the bikes on a rainy weather.
+```{r}
+plot3_alt
+```
+
+In this plot, we are able to see clearly the demand of bike sharing services on a daily basis across the two months in 2017. As indicated in the chart, two outliers are found to have the lowest demand in each month which are critical for bike operating company to look into, in order to identify the cause of such occurrence. Such outliers are beyond normal rainy weather and more towards significant events that affected ridership behavior. According to an article in floodlist, flooding was found to be the culprit that caused traffic and transport problems and damage to property between 08 and 09 August 2017. Flash floods were reported on the day in London and caused disruption to transport services and road users.
+
+As a bike service operator company, although difficult to prevent the occurrence of such unexpected events, it is important to prepare measures in place to prevent damages to the bikes so that maintenance and replacement costs can be minimized even if the demand takes a hit.
+
+
+### 3.4 Research Question 4: What are the peak usage periods throughout the day?
+```{r message = FALSE,warning=FALSE}
+# Develop a timeslot function to create buckets for each intervals in a day
+timeslot <- function(hour,minute)
+{
+  a <- ifelse(minute < 30,sprintf("%02d:00-%02d:30",hour,hour), sprintf("%02d:30-%02d:00",hour,ifelse(hour == 23,0,hour+1)))
+  
+}
+
+# Utilizing timeslot function to group demands in a day into buckets of timeslots to determine general demand in a day
+
+journey_new$timeslot <- timeslot(journey_new$Start.Hour,journey_new$Start.Minute)
+journey_new$timeslot <- as.factor(journey_new$timeslot)
+plot4_df <- journey_new %>% group_by(timeslot,dow) %>% summarise(Demand = n())
+
+# Plotting the bar chart
+plot4 <- plot4_df %>% ggplot(aes(x=Demand, y= timeslot)) + geom_bar(stat='identity',fill="#008080") + theme_minimal() + theme(axis.text.y = element_text(size=6.5)) + ylab("Timeslot in a Day") +labs(title="Demand Distribution throughout the day in 30 minutes interval")
+
+
+# Extracting the Top 3 Demands from each day
+top3_each_day <- plot4_df %>% group_by(dow) %>% arrange(desc(Demand)) %>% slice_head(n=3) %>% mutate(Rank = "top") %>% ungroup()
+
+# Get the rest by excluding the top 3
+rest <- anti_join(plot4_df, top3_each_day, by = c("dow", "timeslot", "Demand")) %>% mutate(Rank = "rest")
+
+# Merge the dataset
+plot4_df2 <- rbind(top3_each_day,rest)
+
+# Plotting gganimate to show top 3 timeslot demands from each day
+plot4_df2 <- plot4_df2 %>% arrange(timeslot,dow)
+plot4_animate <- plot4_df2 %>% ggplot(aes(x=Demand,y=timeslot,fill=Rank)) + geom_bar(stat='identity') + theme_minimal()+ theme(axis.text.y = element_text(size=7)) + scale_fill_manual(values=c("darkgrey","tomato")) + transition_states(dow,transition_length = 2,state_length = 1) + labs(title="Day of Week: {closest_state} | Demand of Each Day") +ylab("Timeslot in a Day")
+
+
+plot4
+```
+
+This plot takes all the journeys from the Journey Dataset and separated them into buckets of timeslot regardless of the day or date. Hence, this plot shows the general demand in a day and with this insight, we are able to identify the peak period usage throughout the day. It can be observed that the bike sharing service's demand generally peaks twice a day, specially between 1730 - 1800 and 0830 - 0900. This observation is likely due to users using the bikes for commuting to and from work in the bustling city of London. With this insight, business can plan accordingly to distribute necessary resources to support demands at different timing as well as plan possible maintenence time when the demand is at its lowest.
+
+```{r message=FALSE,warning=FALSE}
+plot4_animate
+```
+
+To receive a more accurate analysis for businesses to take action, the plot is further split into specific day of the week so that the demands for each day can be better studied. Furthermore, indicators are made on each day to highlight the peak demands of the timeslot in the respective day. From observation, we can see some slight differences in the demand during Weekends as compared to Weekdays. On weekends, most of the peak periods are revolving around late afternoon to evening timing which could suggest users may use such bike services for leisure purposes around the park or the city as referencing to our previous findings above.
+
+
+### 3.5 Research Question 5: Which critical stations require additional resource allocation based on usage intensity?
+
+To answer this question, we will first setup perimeters to track historical departure and arrivals based on the dataset provided. A dataframe will then be created to track the inflow and outflow of the bikes from each station. This will give us a general idea of the demands of each station. We are also making an assumption that the capacity value is the current number of available bikes at the station so that we can observe the flows of bikes in each station. 
+```{r message=F,warning=F}
+
+# Preparing dataset
+journeytest <- journey_new
+journeytest$timeslotend <- timeslot(journeytest$End.Hour,journeytest$End.Minute)
+journeytest$timeslotend <- as.factor(journeytest$timeslotend)
+journeytest$Date <- date(journeytest$Start.Time)
+
+station$Station.ID <- as.factor(station$Station.ID)
+
+
+# Creating columns to track departures and arrivals of the stations
+journeytest <- journeytest %>% select(Date,timeslot,Start.Station.ID,timeslotend,End.Station.ID)
+
+departures <- journeytest %>% group_by(Start.Station.ID, timeslot,Date) %>% summarise(Outflow = n(), .groups="drop") %>% rename(Station.ID = Start.Station.ID,Timeslot=timeslot)
+
+arrivals <- journeytest %>% group_by(End.Station.ID,timeslotend,Date) %>% summarise(Inflow = n(), .groups="drop") %>% rename(Station.ID=End.Station.ID,Timeslot=timeslotend)
+
+
+# Prepare flow dataframe to show the inflow and outflow of bikes of each station
+
+flow_df <- full_join(arrivals,departures, by =c("Station.ID","Timeslot","Date")) %>% mutate(Inflow = replace_na(Inflow,0),Outflow= replace_na(Outflow,0), Netflow = Inflow-Outflow, Station.ID = as.factor(Station.ID))
+flow_df <- flow_df %>% arrange(Station.ID, Date, Timeslot)
+
+flow_df <- flow_df %>% left_join(station,by="Station.ID")%>%group_by(Station.ID)%>% mutate(NewCapacity = Capacity + cumsum(Netflow))
+flow_df <- flow_df %>% select(Date,Station.ID,Timeslot,Inflow,Outflow,Netflow,Capacity,NewCapacity) %>% arrange(Date,Station.ID,Timeslot)
+
+flow_df <- flow_df %>% mutate(RemainingPct= NewCapacity/Capacity)
+head(flow_df,5)
+```
+
+From here, we will flag out stations that are risky using the RemainingPct perimeter set at 10%. What this means is that, it will compare the original capacity with the newcapacity value and whenever the newcapacity drops till <b>10% or below</b> of the original capacity value, it will be flagged out. Next, we extract stations that have been flagged at least once into a new dataframe called <b>risky_station</b> shown below.
+
+Then from this dataframe, the stations are counted on the number of times they have been flagged falling below this threshold, indicating that they experience high demand and low supply which is critical and vital as we want to prevent a situation where users want to rent a bike but no bikes are available in the station.
+```{r message=F,warning=F}
+# Flagging out Stations to monitor flow of supply and demand of risky stations
+risky_station <- flow_df %>% filter(RemainingPct<0.1)
+head(risky_station,5)
+
+riskydf <- risky_station %>% group_by(Station.ID) %>% summarise(TimesFlagged=n(),TotalNetOutflow = sum(-Netflow[Netflow<0]),.groups="drop") %>% arrange(desc(TimesFlagged)) %>% slice_head(n=10)
+
+plot5 <- riskydf %>% ggplot(aes(x = TimesFlagged, y = Station.ID)) + geom_bar(stat='identity',fill="#1E90FF") + xlab("Station ID") + ylab("Number of Times Flagged") + labs(title="Top 10 Most Flagged Stations - High Risk") +theme_minimal()
+plot5
+
+```
+
+According to the plot, these are the stations that have been flagged the most for falling below the threshold. Further analysis needs to be conducted to determine the demand that these stations are facing so that suitable recommendations could be provided for the business operators.
+
+```{r message=F,warning=F}
+# Taking the Flagged Station IDs
+flagged_stations <- c(riskydf$Station.ID)
+
+# Filtering out only the top 10 flagged stations
+plot5_altdf <- journey_new[journey_new$Start.Station.ID %in% flagged_stations,] 
+
+plot5_altdf <- plot5_altdf %>% mutate(Date = date(Start.Time),Station.ID = as.factor(Start.Station.ID))
+plot5_alt <- plot5_altdf %>% group_by(Station.ID,Date) %>% summarise(Station.Demands = n()) %>% ggplot(aes(x=Station.ID,y=Station.Demands)) + geom_bar(stat='identity', fill="#6A5ACD") + ylab("Demands of the Flagged Stations") + xlab("Station's IDs") + labs(title="Demand of the Top 10 Flagged Stations") + theme_minimal()
+                                                                                                                                                       
+plot5_alt
+```
+
+With this information, bike sharing operators can reallocate resources to ensure that these demands are met as they are likely to be situated at popular transport hub, intersections or highly populated areas with people using the bikes frequently. To specifically identify the locations of these stations, further analysis and insights will be provided at later plot as it is related with Users' most popular route as well. Please refer below for the exact locations of these stations.
+```{r}
+plot5_alt + transition_time(Date)+ labs(title="Date: {frame_time} | Daily Demand of the Top 10 Flagged Stations")
+```
+
+This visualisation shows the changes in demand on a daily basis across August and September 2017. From this animation, station 154 and 248 can be observed to have some of the highest demand in general throughout the days as compared to the other 8 stations.
+
+### 3.6 Research Question 6: How do riding patterns differ between leisure users and commuters across weekdays and weekends?
+```{r message=F,warning=F}
+# Ensure Original Dataset is not modified to preserve data integrity
+plot6_df <- journey_new
+
+# Riding for leisure else commuters (More than 30 mins) - Logical Value
+plot6_df$Is.Leisure <- ifelse(plot6_df$Duration_m >= 30, T, F)
+
+# Preparing dataset to track leisure and commuter riders on Weekdays
+plot6_weekday <- plot6_df %>% filter(Is.Weekend == FALSE) %>% group_by(Is.Leisure, timeslot)  %>% summarise(Demand = n())
+
+plot6_weekday <- plot6_weekday %>% ggplot(aes(x=timeslot,y=Demand,color=Is.Leisure, group=Is.Leisure)) + geom_line()+ theme_minimal() + theme(axis.text.x = element_text(angle = 90)) + labs(title="Leisure Vs Commuter Riders on a Weekday") + xlab("Timeslot in a Day")
+
+
+
+# Preparing dataset to track leisure and commuter riders on Weekends
+plot6_weekend <- plot6_df %>% filter(Is.Weekend == TRUE) %>% group_by(Is.Leisure, timeslot)  %>% summarise(Demand = n())
+
+plot6_weekend <- plot6_weekend %>% ggplot(aes(x=timeslot,y=Demand,color=Is.Leisure, group=Is.Leisure)) + geom_line()+theme_minimal() + theme(axis.text.x = element_text(angle = 90)) + labs(title="Leisure Vs Commuter Riders on a Weekend") +xlab("Timeslot in a Day") 
+
+plot6_weekday
+
+```
+
+Since there are <b>no perimeters available</b> for us to determine riders' intention of riding the bikes, <u>assumptions was made</u> in the attempt to uncover insights for this research question. Here, we assume riders that rode <b>more than 30 minutes are leisure riders</b> while riders rode <b>less than 30 minutes are commuters</b>. Since commuters tend to use bikes as a last-mile travel therefore, their durations are usually lesser than leisure riders. 
+
+From this graph, we are able to observe the demand distributions between Leisure Riders and Commuters across the day in buckets of 30 mins interval. Generally we can see that leisure riders tend to be on the low-side during Weekdays as most people uses bike sharing services for school or work.
+
+<i>Disclaimer: It is also important to note that there are instances where Leisure Riders ride for less than 30 minutes and Commuters ride for more than 30 minutes </i>
+
+```{r}
+plot6_weekend
+```
+
+As for the Weekend chart, noticeable difference can be observed between the Leisure Riders' Pattern and Commuters' Pattern. There is a <b>significant increase</b> in the number of longer duration rides while the shorter duration rides has a <b>significant drop</b> in the demand. Therefore, with such patterns present, it is important for bike operators to cater for such differences in the rider types so that demand and supply can be anticipated on Weekdays and Weekends.
+
+### 3.7 Research Question 7: When is the optimal time to schedule bike maintenance to minimize service disruption?
+```{r message=F,warning=F}
+# Preparation of dataset
+plot7_df <- journey_new %>% group_by(timeslot,Is.Weekend) %>% summarise(Demand = n())
+
+# Find minimum demand row for weekday
+min_weekday <- plot7_df %>% filter(Is.Weekend == FALSE) %>% ungroup() %>% filter(Demand == min(Demand)) 
+
+plot7_weekday <- plot7_df %>% filter(Is.Weekend == FALSE) %>% ggplot(aes(x=Demand, y= timeslot)) + geom_bar(stat='identity',fill="steelblue") + theme_minimal() + theme(axis.text.y = element_text(size=6.5))
+plot7_weekday <- plot7_weekday + annotate("segment",
+           x = min_weekday$Demand + 600, xend = min_weekday$Demand,
+           y = min_weekday$timeslot, yend = min_weekday$timeslot,
+           colour = "red", arrow = arrow(type = "closed", length = unit(0.15, "inches")),size=0.05) +
+  annotate("text",
+           x = min_weekday$Demand + 10,
+           y = min_weekday$timeslot,
+           label = "Best Maintenance Period - Lowest Traffic", colour = "red", size = 3, hjust = -0.3) + ylab("Timeslot in a Day") + labs(title="Optimal Time to Schedule Bike Maintenance on Weekdays")
+
+
+# Find minimum demand row for weekend
+min_weekend <- plot7_df %>% filter(Is.Weekend == TRUE) %>% ungroup() %>% filter(Demand == min(Demand))
+
+plot7_weekend <- plot7_df %>% filter(Is.Weekend == TRUE) %>% ggplot(aes(x=Demand, y= timeslot)) + geom_bar(stat='identity',fill="steelblue")+ theme_minimal() + theme(axis.text.y = element_text(size=6.5))
+plot7_weekend <- plot7_weekend + annotate("segment",
+           x = min_weekend$Demand + 150, xend = min_weekend$Demand,
+           y = min_weekend$timeslot, yend = min_weekend$timeslot,
+           colour = "red", arrow = arrow(type = "closed", length = unit(0.15, "inches")),size=0.05) +
+  annotate("text",
+           x = min_weekend$Demand + 10,
+           y = min_weekend$timeslot,
+           label = "Best Maintenance Period - Lowest Traffic", colour = "red", size = 3, hjust = -0.3)+ ylab("Timeslot in a Day") + labs(title="Optimal Time to Schedule Bike Maintenance on Weekends")
+
+plot7_weekday
+
+```
+
+To locate the best maintenance period, we will identify the lowest traffic in the day so as to minimize the cost of disruption on the users. Looking at the indicator, the best timing for maintenance on a Weekday would be between 03:30 - 04:30.
+
+```{r}
+plot7_weekend
+```
+
+As for the weekend, the optimal time to schedule bike maintenance would be between 05:30 - 06:00.
+
+### 3.8 Research Question 8: What is the distribution of journey durations among users?
+```{r}
+# Preparing Dataset
+
+plot8_df <- journey_new %>% filter(Duration_m <= 100)
+
+
+# Extracting Mean & SD to prepare for normal distribution
+mean_duration <- mean(plot8_df$Duration_m, na.rm = TRUE)
+sd_duration <- sd(plot8_df$Duration_m, na.rm = TRUE)
+
+ggplot(plot8_df, aes(x = Duration_m)) +
+  geom_histogram(binwidth = 5, fill = "skyblue", color = "white") +
+  geom_vline(aes(xintercept = mean_duration), color = "red", linetype = "dashed", size = 1) +
+  geom_vline(aes(xintercept = mean_duration + sd_duration), color = "orange", linetype = "dotted", size = 1) +
+  geom_vline(aes(xintercept = mean_duration - sd_duration), color = "orange", linetype = "dotted", size = 1) +
+  labs(title = "Distribution of Ride Durations",
+       x = "Duration (minutes)", y = "Count") +
+  annotate("text", x = mean_duration, y = Inf, label = "Mean", vjust = -0.5, color = "red") +
+  annotate("text", x = mean_duration + sd_duration, y = Inf, label = "+1 SD", vjust = -0.5, color = "orange") +
+  annotate("text", x = mean_duration - sd_duration, y = Inf, label = "-1 SD", vjust = -0.5, color = "orange") +
+  theme_minimal() +
+  scale_x_continuous(breaks = seq(0, 100, by = 5))
+
+```
+
+By allocating bins to the duration in minutes, we are able to plot the distribution of the ride durations across all the journeys that the user had with the bike sharing operator. With the red line signifying its mean and the dotted lines are 1 standard deviation from its mean. From observation, most of the users took around 15 mins for their commuting purposes and significant decrement in the duration usage as the time increases. 
+
+### 3.9 Research Question 9: What are the most common or popular routes taken by users?
+<i> Mapbox API Key is used in this plot. The key is private and hidden.</i>
+```{r include = FALSE}
+# Mapbox Key
+mapbox_token <- "pk.eyJ1IjoicGF0cmlja3Rhbjk4IiwiYSI6ImNtYmJ5bGpiZTA2aXEyanFuMXZ4d211ZDcifQ.bsm_sxh7oXWEL6wcYvhneQ"
+```
+
+```{r}
+# Developing function to determine routes that a user took
+route_function <- function(x){
+  data <- x
+
+  data <- data %>% mutate(route = paste(Start.Station.ID,End.Station.ID, sep=" - ")) %>% select(Start.Station.ID,End.Station.ID,route)
+  data <- data %>% group_by(route) %>% summarise(Count = n())
+  data$route_id <- seq(1,nrow(data))
+  data <- data[,c("route_id","route","Count")]
+  data <- separate(data, "route",into=c("Start.Station.ID","End.Station.ID"),sep=" - ",remove=FALSE )
+  data$Start.Station.ID <- as.factor(data$Start.Station.ID)
+  data$End.Station.ID <- as.factor(data$End.Station.ID)
+  
+  return(data)
+}
+
+# Mapping the Start Station and End Station with a route_id to estabilsh unique routes
+routes_df <- route_function(journey_new)
+
+# Ensure no data are missing in the process of routing
+data_validation_check <- routes_df %>% summarise(total = sum(Count)) #passed
+
+# Merge station with routes_df, add lat,lng and station name.
+
+plot9_df <- routes_df %>% left_join(station, by=c("Start.Station.ID" = "Station.ID"))
+plot9_df <- plot9_df %>% select(route_id,route,Start.Station.ID,Station.Name,lat,lng,End.Station.ID,Count)
+plot9_df <- plot9_df %>% rename(Start.Station.Name = Station.Name, Start.lat = lat,Start.lng = lng)
+
+plot9_df <- plot9_df %>% left_join(station, by=c("End.Station.ID" = "Station.ID"))
+plot9_df <- plot9_df %>% select(route_id,route,Start.Station.ID,Start.Station.Name,Start.lat,Start.lng,End.Station.ID,Station.Name,lat,lng,Count)
+plot9_df <- plot9_df %>% rename(End.Station.Name = Station.Name, End.lat = lat, End.lng = lng)
+mapplot <- plot9_df 
+plot9_df <- plot9_df %>% arrange(desc(Count)) %>% slice_head(n=10) 
+
+
+# Plot top10 most popular route in Mapbox
+
+
+# Build the plot
+fig <- plot_ly()
+
+for (i in 1:nrow(plot9_df)) {
+  fig <- fig %>%
+    add_trace(
+      type = "scattermapbox",
+      mode = "lines+markers",
+      lon = c(plot9_df$Start.lng[i], plot9_df$End.lng[i]),
+      lat = c(plot9_df$Start.lat[i], plot9_df$End.lat[i]),
+      line = list(width = 1.5, color = "lightblue",opacity = 0.5),
+      marker = list(size = 6, color = "orange"),
+      name = paste("Route", plot9_df$route_id[i]),
+      hoverinfo = "text",
+      text = paste0(
+        "Route ", plot9_df$route_id[i], "<br>",
+        plot9_df$Start.Station.Name[i], " → ", plot9_df$End.Station.Name[i], "<br>",
+        "Count: ", plot9_df$Count[i]
+      )
+    )
+}
+
+
+# Finalize layout
+plot9 <- fig %>% layout(
+  mapbox = list(
+    style = "carto-darkmatter",
+    center = list(
+      lat = mean(c(plot9_df$Start.lat, plot9_df$End.lat)),
+      lon = mean(c(plot9_df$Start.lng, plot9_df$End.lng))
+    ),
+    zoom = 12
+  ),
+  margin = list(l = 0, r = 0, t = 0, b = 0)
+)
+
+plot9
+```
+
+This mapplot shows the top 10 routes that user mostly take and it provides the stations information that they started and ended their journey. The blue line denotes the path of their journey from the Start Station to the End Station. However, it is observed that most journeys started and ended at the same station which explains the lack of blue lines seen in the map plot. This is a significant indicator that users either utilize the bikes as a means to travel around the location for errands, last-mile travel or meals. The stations highlighted also happen to be in one of the busiest streets of London, happening right in the center of the city of London.
+
+```{r}
+# To filter out journeys that start and end at the same station
+plot9_dfalt <- mapplot %>% filter(Start.Station.ID != End.Station.ID) %>% arrange(desc(Count)) %>% slice_head(n=10)
+
+
+fig <- plot_ly()
+
+for (i in 1:nrow(plot9_dfalt)) {
+  fig <- fig %>%
+    add_trace(
+      type = "scattermapbox",
+      mode = "lines+markers",
+      lon = c(plot9_dfalt$Start.lng[i], plot9_dfalt$End.lng[i]),
+      lat = c(plot9_dfalt$Start.lat[i], plot9_dfalt$End.lat[i]),
+      line = list(width = 1.5, color = "lightblue",opacity = 0.5),
+      marker = list(size = 6, color = "orange"),
+      name = paste("Route", plot9_dfalt$route_id[i]),
+      hoverinfo = "text",
+      text = paste0(
+        "Route ", plot9_dfalt$route_id[i], "<br>",
+        plot9_dfalt$Start.Station.Name[i], " → ", plot9_dfalt$End.Station.Name[i], "<br>",
+        "Count: ", plot9_dfalt$Count[i]
+      )
+    )
+}
+
+
+# Finalize layout
+plot9alt <- fig %>% layout(
+  mapbox = list(
+    style = "carto-darkmatter",
+    center = list(
+      lat = mean(c(plot9_dfalt$Start.lat, plot9_dfalt$End.lat)),
+      lon = mean(c(plot9_dfalt$Start.lng, plot9_dfalt$End.lng))
+    ),
+    zoom = 12
+  ),
+  margin = list(l = 0, r = 0, t = 0, b = 0)
+)
+
+
+plot9alt
+```
+
+We can also find out the popular routes that users take for when they did not end at the same station that they started with, by using a filter. This plot shows the top 10 routes that users took to travel to a different destination. Similarities can also be spotted where the routes are still concentrated in the same area.
+
+### 3.10 Research Question 10: What is the estimated cost of service disruptions based on usage data? 
+
+Before we can approach this research question, due to the lack of available information we will be using Lime as a benchmark for all bike sharing services. Additionally, based on the analysis above, we will also be assuming that each ride typically last ~15 mins long.
+
+According to Lime, all users will pay a Mb>flat rate of £1 and be charged on a rate of £0.20 per minute</b> and taking each ride to be 15mins long, the total revenue for each journey recorded is 4 pounds for the company. When a certain timeslot is taken out for servicing, that amount of demand is noted as revenue lost hence estimated cost of service disruptions.
+
+<i> Disclaimer: There are other various fixed cost, variable cost involved in operating a bike sharing service however due to limited dataset, this assumption is used as a basic reference point to estimate the cost of service disruptions </i>
+
+```{r}
+# Preparing the distribution of demand in a day
+
+plot10_df <- journey_new %>% group_by(timeslot) %>% summarise(Demand = n())
+plot10_df <- plot10_df %>% mutate(Cost.of.Disruption = Demand * 4,CostLabel = scales::label_currency(prefix = "£", big.mark = ",")(Cost.of.Disruption))
+plot10_df
+
+plot10 <- plot10_df %>% ggplot(aes(x=timeslot, y = Cost.of.Disruption,fill=Cost.of.Disruption)) + geom_bar(stat='identity') + theme_minimal() + theme(axis.text.x = element_text(angle = 90)) + scale_y_continuous(labels = dollar) + labs(title = "Estimated Cost of Disruption per Timeslot", y = "Cost (£)", x = "Timeslot") +scale_fill_gradient(low = "#00FF7F", high = "#FF4500")
+
+plot10
+
+
+```
+
+Referencing to the chart above, the costs are denoted by the gradient colors of the bar and the green bars indicates the lowest cost of disruption if there are any faults in the stations, bikes or even the application software. This insight can be meaningful to bike sharing operators as they will be more prepared to integrate a stronger fail-safe measure or implement a robust system to deter downtime on their bikes, stations or software on peak periods. This can then help company to avoid incurring large amount of disruption cost and maintain satisfactory experience for all users regardless of the day or time.
+
+
+### 4. Conclusion & Recommendations
+
+Based on the analysis conducted, several strategic actions are recommended to enhance service quality, ensure operational efficiency, and support long-term growth and scalability for the bike-sharing operator.
+
+As a key player in urban mobility, the company’s core mission is to deliver convenient, accessible, high-quality, and affordable bike rental services across the dynamic landscape of London. Given the city’s scale and infrastructure, bike-sharing provides a valuable alternative mode of transport, especially for short-distance travel.
+
+To uphold service standards and user satisfaction, it is essential to minimize service downtime through regular bike maintenance, particularly during off-peak hours. Proactive planning should also be in place to manage anticipated surges in demand, ensuring that both bicycles and docking points are optimally available.
+
+From a scalability perspective, certain stations flagged with high demand pose a potential risk of bicycle shortages. It is recommended that the company monitors these high-traffic stations closely and considers strategic redistribution of bikes or the installation of additional stations in underserved yet high-demand areas.
+
+In a competitive market, maintaining leadership requires continuous responsiveness to user pain points and a commitment to resolving issues promptly. This not only enhances user trust but also supports customer retention and brand differentiation.
+
+While many operators are diversifying their fleets and adapting fare structures to meet shifting demand patterns, it is crucial to remain aligned with the company’s original mission: to offer a service that is accessible, reliable, affordable, and user-centric. Staying true to this vision will be instrumental in sustaining the company’s relevance, resilience, and long-term success in the evolving mobility landscape.
+
+### 5. References
+
+MetMetters. (2017, October 10). UK Weather Review: September 2017. RMetS. https://www.rmets.org/metmatters/uk-weather-review-september-2017 
+
+Guardian News and Media. (2017, September 1). Britain’s summer 2017 was wetter but also warmer than average. The Guardian. https://www.theguardian.com/uk-news/2017/sep/01/britains-summer-2017-was-wetter-but-also-warmer-than-average 
+
+Best Bike Share and rental bicycles London: Lime vs. santander and alternatives. Cyclist. (2025, January 30). https://www.cyclist.co.uk/reviews/ridden-and-rated-ultimate-guide-to-london-s-bike-sharing-rental-bicycles 
+
+
+<i> Analysis Done By: Patrick Tan </i>
