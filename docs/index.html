@@ -1,249 +1,323 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Personal Data Analysis Projects</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Your Portfolio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet"/>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
-
     body {
-      font-family: 'Noto Sans KR', sans-serif;
-      background-color: #fffaf3;
-      color: #4a4a4a;
-      margin: 0;
-      padding: 0;
-      transition: background-color 0.3s, color 0.3s;
+      font-family: 'Inter', sans-serif;
+      background-color: #fcfcfc;
+      overflow-x: hidden;
     }
-
-    .dark-mode {
-      background-color: #1e1e1e;
-      color: #ddd;
-    }
-
     header {
-      background-color: #f2e9e4;
-      padding: 40px 20px;
-      text-align: center;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
-
-    .dark-mode header {
-      background-color: #2a2a2a;
-      color: #eee;
-    }
-
-    header h1 {
-      font-size: 32px;
-      margin: 0 0 10px;
-    }
-
-    header p {
-      font-size: 16px;
-      margin: 0;
-      color: #6e6e6e;
-    }
-
-    .dark-mode header p {
-      color: #bbb;
-    }
-
-    .toolbar {
+      background-color: #ffffff;
+      padding: 20px 50px;
       display: flex;
-      justify-content: center;
-      gap: 20px;
-      margin-top: 20px;
-      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #eee;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      transition: box-shadow 0.3s ease;
     }
-
-    .search-bar input {
-      padding: 8px 12px;
-      font-size: 16px;
-      border-radius: 6px;
+    header.scrolled {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+    }
+    header h1 {
+      font-size: 1.5rem;
+      margin: 0;
+      font-weight: 700;
+    }
+    .nav-links a {
+      margin-left: 30px;
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
+      position: relative;
+      padding: 6px 14px;
+      border-radius: 20px;
+      transition: all 0.3s ease;
+    }
+    .nav-links a:hover {
+      box-shadow: 0 0 0 2px #333;
+    }
+    .nav-links a.btn {
+      padding: 6px 14px;
+      border-radius: 20px;
       border: 1px solid #ccc;
     }
-
-    .dark-toggle button {
-      padding: 8px 12px;
-      font-size: 16px;
-      border-radius: 6px;
-      border: none;
-      background-color: #333;
-      color: #fff;
-      cursor: pointer;
+    .nav-links a.btn:hover {
+      box-shadow: 0 0 0 2px #5d7cfb;
     }
 
-    .tabs {
+    .hero {
       display: flex;
       justify-content: center;
-      margin-top: 30px;
-      gap: 10px;
+      align-items: center;
+      gap: 400px;
+      padding: 80px 10%;
     }
-
-    .tab-button {
-      padding: 10px 20px;
-      border: none;
-      background-color: #f6bd60;
-      color: white;
-      font-weight: bold;
-      border-radius: 8px;
-      cursor: pointer;
+    .hero-text {
+      max-width: 400px;
     }
-
-    .tab-button.active {
-      background-color: #e59866;
+    .hero-text h2 {
+      font-size: 1rem;
+      color: #555;
+      margin-bottom: 6px;
     }
-
-    .container {
-      display: none;
-      flex-wrap: wrap;
-      justify-content: center;
-      padding: 40px 20px;
+    .hero-text h1 {
+      font-size: 2rem;
+      font-weight: 700;
     }
-
-    .container.active {
-      display: flex;
-    }
-
-    .card {
-      background-color: #ffffff;
-      border-radius: 16px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-      margin: 20px;
-      padding: 30px;
-      width: 300px;
-      text-align: center;
-      transition: transform 0.2s;
-    }
-
-    .dark-mode .card {
-      background-color: #2c2c2c;
-      color: #ccc;
-    }
-
-    .card:hover {
-      transform: translateY(-5px);
-    }
-
-    .card h3 {
-      margin-top: 10px;
-      font-size: 20px;
-      color: #333;
-    }
-
-    .dark-mode .card h3 {
-      color: #f0f0f0;
-    }
-
-    .card p {
-      font-size: 14px;
+    .hero-text p {
       color: #777;
-      margin: 10px 0 20px;
+      margin: 10px 0;
     }
-
-    .dark-mode .card p {
-      color: #bbb;
-    }
-
-    .card a {
-      display: inline-block;
-      padding: 10px 20px;
-      background-color: #f6bd60;
-      color: #fff;
+    .hero-text a.btn {
+      background-color: #5d7cfb;
+      color: white;
+      padding: 10px 18px;
+      border-radius: 6px;
       text-decoration: none;
+      transition: all 0.3s ease;
+    }
+    .hero-text a.btn:hover {
+      background-color: #435de0;
+      transform: scale(1.05);
+    }
+    .hero-img img {
+      width: 280px;
       border-radius: 8px;
-      font-weight: bold;
     }
-
-    .card a:hover {
-      background-color: #e8a954;
+    .section {
+      padding: 80px 10%;
+      background-color: #fff;
     }
-
-    footer {
+    .section-title {
+      text-align: center;
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .section-subtitle {
+      text-align: center;
+      color: #666;
+      margin-top: 0;
+      margin-bottom: 40px;
+    }
+    .interest-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(200px, 1fr));
+      gap: 40px 60px;
+      justify-content: center;
+      padding: 0 40px;
+    }
+    .interest-grid div {
       text-align: center;
       padding: 20px;
-      font-size: 13px;
-      color: #aaa;
-      background-color: #f9f9f9;
+    }
+    .interest-grid h5 {
+      font-weight: 700;
+      margin-top: 16px;
+    }
+    .interest-grid p {
+      font-size: 0.9rem;
+      color: #666;
+    }
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr); /* exactly 3 items */
+      gap: 130px; /* adjust spacing here */
+      justify-content: center;
+      max-width: 1200px;
+      margin: 0 auto;
     }
 
-    .dark-mode footer {
-      background-color: #2a2a2a;
-      color: #888;
+
+    .project-item img {
+      width: 100%;
+      height: 200px; /* or another fixed height */
+      object-fit: cover; /* ensures the image fills the box without distortion */
+      border-radius: 6px;
+    }
+
+    .project-item h5 {
+      margin-top: 10px;
+      font-weight: 700;
+    }
+    .project-item small {
+      display: block;
+      margin: 4px 0;
+      color: #999;
+    }
+    .project-item p {
+      font-size: 0.9rem;
+      color: #555;
+    }
+    footer {
+      text-align: center;
+      padding: 40px 0;
+      font-size: 0.85rem;
+      color: #aaa;
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>Personal Data Analysis Projects</h1>
-    <p>Data Analysis Portfolio done with R Studio</p>
-    <div class="toolbar">
-      <div class="search-bar">
-        <input type="text" id="searchInput" placeholder="Search project...">
-      </div>
-      <div class="dark-toggle">
-        <button onclick="toggleDarkMode()">Toggle Dark Mode</button>
-      </div>
+    <h1>Patrick Tan</h1>
+    <div class="nav-links">
+      <a href="#home">HOME</a>
+      <a href="about.html">ABOUT</a>
+      <a href="#projects">PORTFOLIO</a>
+      <a href="contactme.html">CONTACT ME</a>
+      <a href="#resume" class="btn">RESUME</a>
     </div>
   </header>
 
-  <div class="tabs">
-    <button class="tab-button active" onclick="switchTab('data')">Data Analysis</button>
-    <button class="tab-button" onclick="switchTab('dash')">Dashboard</button>
-  </div>
+  <section id="home" class="hero">
+    <div class="hero-text">
+      <h2>I am</h2>
+      <h1>Patrick</h1>
+      <p>Aspiring data analyst. Driven by curiosity and the pursuit of impactful discoveries.</p>
+      <a href="#projects" class="btn">MY PROJECTS</a>
+    </div>
+    <div class="hero-img">
+      <img src="profile.jpg" alt="Profile">
+    </div>
+  </section>
 
-  <div class="container active" id="data">
-    <div class="card">
-      <h3>Toto Data Analysis</h3>
-      <p>Analyzes betting behavior, patterns, and jackpot results from Toto lottery data.</p>
-      <a href="Toto-Data-Analysis-Project.html">View</a>
+  <section id="about" class="section">
+    <h2 class="section-title">Areas of Interest</h2>
+    <p class="section-subtitle">Take a look at some of the things I love working on.</p>
+    <div class="interest-grid">
+      <div>
+        <i class="fas fa-cloud fa-2x"></i>
+        <h5>Relational Databases</h5>
+        <p>I enjoy making queries quick, readable and scalable. Taking the lessons from the classroom and applying into real-world situation. I also further sharpen my skills by practicing on platforms like Leetcode & Hacker Rank.  </p>
+      </div>
+      <div>
+        <i class="fas fa-tachometer fa-2x"></i>
+        <h5>Dashboard</h5>
+        <p>I have developed multiple dashboards for my University projects and personal projects as well. I love making interactive dashboard to summarise complicated data analysis into aesthetic and impactful visualization to drive actions or provide historical insights for businesses.</p>
+      </div>
+      <div>
+        <i class="fas fa-graduation-cap fa-2x"></i>
+        <h5>Personal Growth</h5>
+        <p>I believe the value of a person is quantify by two things, technical skills and character. While I love to learn new technical skills to stack up on my portfolio, soft skills also hold equal weight as it determines my ability and attitude to work in teams or with important projects.</p>
+      </div>
+      <div>
+        <i class="fas fa-microchip fa-2x"></i>
+        <h5>App Development</h5>
+        <p>I have developed a navigation app with Rshiny and various GoogleAPIs for my university project. And I love the process of building and to witness ideas materializing.</p>
+      </div>
+      <div>
+        <i class="fas fa-rocket fa-2x"></i>
+        <h5>Model Deployment</h5>
+        <p>I implement machine learning models such as regression models, NLP, Random Forest KNN to discover meaningful insights for real-world application.</p>
+      </div>
+      <div>
+        <i class="fas fa-chart-bar fa-2x"></i>
+        <h5>Data Analytics</h5>
+        <p>Data are just numbers, but stories are impactful. I enjoy translating data insights into a beautiful, compelling and easy to understand story for non-technical readers as I believe insights are only powerful if everyone is on the same page.</p>
+      </div>
     </div>
+  </section>
 
-    <div class="card">
-      <h3>Kickstarter Data Analysis</h3>
-      <p>Explores factors that influence success of Kickstarter campaigns through project data.</p>
-      <a href="Kickstarter Data Analysis Project.html">View</a>
+  <section id="projects" class="section">
+    <h2 class="section-title">My Latest Projects</h2>
+    <p class="section-subtitle">Take a look at my recent work.</p>
+    <div class="projects-grid">
+      <div class="project-item">
+        <a href="Bike-Sharing-Business-Project.html">
+          <img src="bikes.jpg" alt="Project 1">
+        </a>
+        <small>Jun 18, 2025</small>
+        <h5><a href="Bike-Sharing-Business-Project.html" style="text-decoration: none; color: inherit;">Bike Sharing Services</a></h5>
+        <p>An in-depth analysis on a bike sharing operator business located in the heart of London. Diving deep into data to provide valuable recommendations for existing & future business to prosper.</p>
+      </div>
+      <div class="project-item">
+        <a href="https://patricktan.shinyapps.io/KickstarterDashboard/">
+          <img src="dashboard.jpg" alt="Project 2">
+        </a>
+        <small>May 01, 2025</small>
+        <h5><a href="https://patricktan.shinyapps.io/KickstarterDashboard/" style="text-decoration: none; color: inherit;">Kickstarter Interactive Dashboard</a></h5>
+        <p>An interactive dashboard built with Flexdashboard to summarise data-analysis conducted on Kickstarter. Additional feature to allow the display of specific projects and their information.</p>
+      </div>
+      <div class="project-item">
+        <a href="Kickstarter Data Analysis Project.html">
+          <img src="kickstarter.jpg" alt="Project 3">
+        </a>
+        <small>Apr 24, 2025</small>
+        <h5><a href="Kickstarter Data Analysis Project.html" style="text-decoration: none; color: inherit;">Kickstarter Projects</a></h5>
+        <p>Have a great idea to start out your small business? This project provides a full in-depth analysis of all projects within Kickstarter with the goal of seeking to discover what it takes to make your dream idea a successful one. </p>
+      </div>
+      <div class="project-item">
+        <a href="Toto-Data-Analysis-Project.html">
+          <img src="lottery.jpg" alt="Project 4">
+        </a>
+        <small>Apr 26, 2025</small>
+        <h5><a href="Toto-Data-Analysis-Project.html" style="text-decoration: none; color: inherit;">Overnight Millionaire with Toto?</a></h5>
+        <p>Had a dream about striking lottery? This fun analysis dives into the history of Punters and Toto Winners, providing valuable insights so that you can make a sounding decision. <i>Should I play too?</i></p>
+      </div>
     </div>
-    
-    <div class="card">
-      <h3>Bike Station Analysis</h3>
-      <p>Analyzes supply-demand imbalance and optimization strategies at London bike stations.</p>
-      <a href="Bike-Sharing-Business-Project.html">View</a>
+  </section>
+
+ <footer style="background-color: #1e1e2f; color: #ccc; padding: 50px 10% 30px;">
+  <div class="container-fluid px-5">
+    <div class="d-flex flex-column flex-md-row justify-content-between gap-5 text-center text-md-start">
+
+      <!-- About Section -->
+      <div style="flex: 1;">
+        <h5 style="color: #ffffff; font-weight: 600; margin-bottom: 16px;">About Me</h5>
+        <p style="font-size: 0.95rem; line-height: 1.6;">
+          This is my personal portfolio, built to showcase key projects, technical skillsets, and competency in data analysis, dashboard skills, and creative problem solving.
+        </p>
+        <p style="font-size: 0.85rem; margin-top: 25px; color: #aaa;">
+          &copy; 2025 Patrick Tan. All rights reserved.
+        </p>
+      </div>
+
+      <!-- Soft Skills Section -->
+      <div style="flex: 1;">
+        <h5 style="color: #ffffff; font-weight: 600; margin-bottom: 16px;">Soft Skills & Languages</h5>
+        <p style="font-size: 0.95rem; line-height: 1.6;">
+          Effective Communication<br>
+          Adaptability & Resilience<br>
+          Project Management<br>
+          Analytical<br>
+          Multilingual: English (Native), Korean (Advanced), Mandarin (Intermediate)
+        </p>
+      </div>
+
+      <!-- Social Media Section -->
+      <div style="flex: 1;">
+        <h5 style="color: #ffffff; font-weight: 600; margin-bottom: 16px;">Connect With Me</h5>
+        <div style="font-size: 1.3rem; margin-top: 12px;">
+          <a href="https://www.linkedin.com/in/patrick-tan20" target="_blank" style="color: #99b3ff; margin-right: 20px;"><i class="fab fa-linkedin"></i></a>
+          <a href="https://github.com/pattowick" target="_blank" style="color: #99b3ff; margin-right: 20px;"><i class="fab fa-github"></i></a>
+          <a href="mailto:patricktan98@gmail.com" style="color: #99b3ff;"><i class="fas fa-envelope"></i></a>
+        </div>
+      </div>
+
     </div>
   </div>
-  
-  <div class="container" id="dash">
-    <div class="card">
-      <h3>Kickstarter Project Dashboard</h3>
-      <p>Interactive Dashboard presentable to Non-Technical Users. Includes added features for better visualisation of Data</p>
-      <a href="https://patricktan.shinyapps.io/KickstarterDashboard/">View</a>
-    </div>
-  </div>
+</footer>
 
-  <footer>
-    &copy; 2025 Patrick Tan. All rights reserved.
-  </footer>
 
   <script>
-    function toggleDarkMode() {
-      document.body.classList.toggle('dark-mode');
-    }
-
-    function switchTab(tabId) {
-      const containers = document.querySelectorAll('.container');
-      const buttons = document.querySelectorAll('.tab-button');
-      containers.forEach(c => c.classList.remove('active'));
-      buttons.forEach(b => b.classList.remove('active'));
-      document.getElementById(tabId).classList.add('active');
-      event.target.classList.add('active');
-    }
-
-    document.getElementById('searchInput').addEventListener('input', function() {
-      const filter = this.value.toLowerCase();
-      const cards = document.querySelectorAll('.container.active .card');
-      cards.forEach(card => {
-        const title = card.querySelector('h3').textContent.toLowerCase();
-        card.style.display = title.includes(filter) ? 'block' : 'none';
-      });
+    window.addEventListener('scroll', function () {
+      const header = document.querySelector('header');
+      if (window.scrollY > 0) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
     });
   </script>
 </body>

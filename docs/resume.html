@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Resume</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #fcfcfc;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+    header {
+      background-color: #ffffff;
+      padding: 20px 50px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #eee;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+    .nav-links a {
+      margin-left: 30px;
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
+      position: relative;
+      padding: 6px 14px;
+      border-radius: 20px;
+      transition: all 0.3s ease;
+    }
+    .nav-links a:hover {
+      box-shadow: 0 0 0 2px #333;
+    }
+    .nav-links a.btn {
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+    }
+    .nav-links a.btn:hover {
+      box-shadow: 0 0 0 2px #5d7cfb;
+    }
+
+    .resume-section {
+      padding: 60px 10% 30px;
+      text-align: center;
+    }
+
+    .resume-section h2 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .resume-section p {
+      color: #666;
+      margin-bottom: 40px;
+    }
+
+    .resume-frame {
+      width: 100%;
+      max-width: 850px;
+      height: 1000px;
+      border: none;
+      margin: 0 auto;
+      display: block;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      border-radius: 6px;
+    }
+
+    .download-btn {
+      margin-top: 30px;
+      display: inline-block;
+      padding: 10px 24px;
+      font-weight: 600;
+      color: white;
+      background-color: #5d7cfb;
+      border: none;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: background-color 0.3s ease;
+    }
+
+    .download-btn:hover {
+      background-color: #435de0;
+    }
+
+    footer {
+      text-align: center;
+      padding: 40px 0 20px;
+      font-size: 0.85rem;
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Patrick Tan</h1>
+    <div class="nav-links">
+      <a href="index.html">HOME</a>
+      <a href="about.html">ABOUT</a>
+      <a href="index.html#projects">PORTFOLIO</a>
+      <a href="contactme.html">CONTACT ME</a>
+      <a href="resume.html" class="btn">RESUME</a>
+    </div>
+  </header>
+
+  <section class="resume-section">
+    <h2>My Resume</h2>
+    <p>This is a snapshot of my educational qualifications, work experiences and projects</p>
+    <iframe class="resume-frame" src="Patrick Tan Jing Long_Resume.pdf"></iframe>
+    <a class="download-btn" href="Patrick Tan Jing Long_Resume.pdf" download>Download PDF</a>
+  </section>
+
+  <footer style="background-color: #1e1e2f; color: #ccc; padding: 50px 10% 30px;">
+  <div class="container-fluid px-5">
+    <div class="d-flex flex-column flex-md-row justify-content-between gap-5 text-center text-md-start">
+
+      <!-- About Section -->
+      <div style="flex: 1;">
+        <h5 style="color: #ffffff; font-weight: 600; margin-bottom: 16px;">About Me</h5>
+        <p style="font-size: 0.95rem; line-height: 1.6;">
+          This is my personal portfolio, built to showcase key projects, technical skillsets, and competency in data analysis, dashboard skills, and creative problem solving.
+        </p>
+        <p style="font-size: 0.85rem; margin-top: 25px; color: #aaa;">
+          &copy; 2025 Patrick Tan. All rights reserved.
+        </p>
+      </div>
+
+      <!-- Soft Skills Section -->
+      <div style="flex: 1;">
+        <h5 style="color: #ffffff; font-weight: 600; margin-bottom: 16px;">Soft Skills & Languages</h5>
+        <p style="font-size: 0.95rem; line-height: 1.6;">
+          Effective Communication<br>
+          Adaptability & Resilience<br>
+          Project Management<br>
+          Analytical<br>
+          Multilingual: English (Native), Korean (Advanced), Mandarin (Intermediate)
+        </p>
+      </div>
+
+      <!-- Social Media Section -->
+      <div style="flex: 1;">
+        <h5 style="color: #ffffff; font-weight: 600; margin-bottom: 16px;">Connect With Me</h5>
+        <div style="font-size: 1.3rem; margin-top: 12px;">
+          <a href="https://www.linkedin.com/in/patrick-tan20" target="_blank" style="color: #99b3ff; margin-right: 20px;"><i class="fab fa-linkedin"></i></a>
+          <a href="https://github.com/pattowick" target="_blank" style="color: #99b3ff; margin-right: 20px;"><i class="fab fa-github"></i></a>
+          <a href="mailto:patricktan98@gmail.com" style="color: #99b3ff;"><i class="fas fa-envelope"></i></a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
