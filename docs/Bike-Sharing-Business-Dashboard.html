@@ -61,7 +61,8 @@
   <script type='text/javascript'>
     const divElement = document.getElementById('vizAutoFit');
     const vizElement = divElement.getElementsByTagName('object')[0];
-    vizElement.style.height = '100vh'; // Default
+    vizElement.style.height = 'auto';
+    vizElement.style.minHeight = '900px';
     vizElement.style.width = '100%';
 
     const scriptElement = document.createElement('script');
