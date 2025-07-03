@@ -160,6 +160,29 @@
       font-size: 0.9rem;
       color: #555;
     }
+    .skill-tag {
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.85rem;
+      font-weight: 500;
+      padding: 6px 12px;
+      margin: 4px;
+      border-radius: 12px;
+      background-color: #f3f3f3;
+      color: #333;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+    
+    .skill-tag i {
+      margin-right: 6px;
+      font-size: 0.9rem;
+    }
+    
+    .sql-tag      { background-color: #e6ecfc; }     /* pastel blue */
+    .python-tag   { background-color: #e6f7f2; }     /* pastel green */
+    .r-tag        { background-color: #fff6e6; }     /* pastel orange */
+    .tableau-tag  { background-color: #fce6ec; }     /* pastel pink */
+
     footer {
       text-align: center;
       padding: 40px 0;
@@ -234,12 +257,22 @@
     <p class="section-subtitle">Take a look at my recent work.</p>
     <div class="projects-grid">
       <div class="project-item">
+        <a href="SQL_project.html">
+          <img src="wise-product-logo.jpg" alt="Project 6">
+        </a>
+        <small>Jul 01, 2025 | Latest Project</small>
+        <h5><a href="SQL_project.html" style="text-decoration: none; color: inherit;">Global Payment SQL Analysis</a></h5>
+        <p>A case study used to showcase my SQL abilities using PostgreSQL to query real-life business problem statements to improve the company's profitability.</p>
+        <span class="skill-tag sql-tag"><i class="fas fa-tag"></i>SQL</span>
+      </div>
+      <div class="project-item">
         <a href="Bike-Sharing-Business-Dashboard.html">
           <img src="dashboard2.jpg" alt="Project 5">
         </a>
         <small>Jun 20, 2025 | Latest Project</small>
         <h5><a href="Bike-Sharing-Business-Dashboard.html" style="text-decoration: none; color: inherit;">Bike Sharing Tableau Dashboard</a></h5>
         <p>Dashboard built with Tableau to provide insightful visualization of the data analysis conducted on a bike sharing operator business.</p>
+        <span class="skill-tag tableau-tag"><i class="fas fa-tag"></i>Tableau</span>
       </div>
       <div class="project-item">
         <a href="Bike-Sharing-Business-Project.html">
@@ -248,6 +281,7 @@
         <small>Jun 18, 2025 | Latest Project</small>
         <h5><a href="Bike-Sharing-Business-Project.html" style="text-decoration: none; color: inherit;">Bike Sharing Services</a></h5>
         <p>An in-depth analysis on a bike sharing operator business located in the heart of London. Diving deep into data to provide valuable recommendations for existing & future business to prosper.</p>
+        <span class="skill-tag r-tag"><i class="fas fa-tag"></i>R</span>
       </div>
       <div class="project-item">
         <a href="https://patricktan.shinyapps.io/KickstarterDashboard/">
@@ -256,6 +290,8 @@
         <small>May 01, 2025</small>
         <h5><a href="https://patricktan.shinyapps.io/KickstarterDashboard/" style="text-decoration: none; color: inherit;">Kickstarter Interactive Dashboard</a></h5>
         <p>An interactive dashboard built with Flexdashboard to summarise data-analysis conducted on Kickstarter. Additional feature to allow the display of specific projects and their information.</p>
+        <span class="skill-tag r-tag"><i class="fas fa-tag"></i>R</span>
+        <span class="skill-tag r-tag"><i class="fas fa-tag"></i> R Flex Dashboard</span>
       </div>
       <div class="project-item">
         <a href="Kickstarter Data Analysis Project.html">
@@ -264,6 +300,7 @@
         <small>Apr 24, 2025</small>
         <h5><a href="Kickstarter Data Analysis Project.html" style="text-decoration: none; color: inherit;">Kickstarter Projects</a></h5>
         <p>Have a great idea to start out your small business? This project provides a full in-depth analysis of all projects within Kickstarter with the goal of seeking to discover what it takes to make your dream idea a successful one. </p>
+        <span class="skill-tag r-tag"><i class="fas fa-tag"></i>R</span>
       </div>
       <div class="project-item">
         <a href="Toto-Data-Analysis-Project.html">
@@ -272,6 +309,7 @@
         <small>Apr 26, 2025</small>
         <h5><a href="Toto-Data-Analysis-Project.html" style="text-decoration: none; color: inherit;">Overnight Millionaire with Toto?</a></h5>
         <p>Had a dream about striking lottery? This fun analysis dives into the history of Punters and Toto Winners, providing valuable insights so that you can make a sounding decision. <i>Should I play too?</i></p>
+        <span class="skill-tag r-tag"><i class="fas fa-tag"></i>R</span>
       </div>
     </div>
   </section>
